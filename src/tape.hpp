@@ -13,33 +13,33 @@
 
 class Tape {
     std::fstream file;
-    std::string filePath;
-    size_t currentPos;
+    std::string file_path;
+    size_t current_pos;
 
-    static int readDelay;
-    static int writeDelay;
-    static int rewindDelay;
-    static int shiftDelay;
+    static int read_delay;
+    static int write_delay;
+    static int rewind_delay;
+    static int shift_delay;
 
-    void applyDelay(int delay) const {
+    void apply_delay(int delay) const {
         if (delay > 0) {
             //std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         }
     }
 
 public:
-    static void setDelays(int rd, int wd, int rwd, int sd) {
-        readDelay = rd;
-        writeDelay = wd;
-        rewindDelay = rwd;
-        shiftDelay = sd;
+    static void set_delays(int rd, int wd, int rwd, int sd) {
+        read_delay = rd;
+        write_delay = wd;
+        rewind_delay = rwd;
+        shift_delay = sd;
     }
 
-    Tape(const std::string& path, bool createIfNotExists = false)
-                                : filePath(path), currentPos(0) {
+    Tape(const std::string& path, bool create_if_no = false)
+                                : file_path(path), current_pos(0) {
         file.open(path, std::ios::in | std::ios::out | std::ios::binary);
         if (!file.is_open()) {
-            if (createIfNotExists) {
+            if (create_if_no) {
                 std::ofstream outFile(path, std::ios::binary);
                 outFile.close();
                 file.open(path, std::ios::in | std::ios::out | std::ios::binary);
@@ -61,49 +61,49 @@ public:
     }
 
     int read() {
-        applyDelay(readDelay);
-        file.seekg(currentPos * sizeof(int));
+        apply_delay(read_delay);
+        file.seekg(current_pos * sizeof(int));
         int value;
         file.read(reinterpret_cast<char*>(&value), sizeof(int));
         if (!file) {
             throw std::runtime_error("Read error or end of tape");
         }
-        currentPos++;
+        current_pos++;
         return value;
     }
 
     void write(int value) {
-        applyDelay(writeDelay);
-        file.seekp(currentPos * sizeof(int));
+        apply_delay(write_delay);
+        file.seekp(current_pos * sizeof(int));
         file.write(reinterpret_cast<const char*>(&value), sizeof(int));
         file.flush();
-        currentPos++;
+        current_pos++;
     }
 
-    void moveLeft() {
-        applyDelay(shiftDelay);
-        if (currentPos == 0) {
+    void move_left() {
+        apply_delay(shift_delay);
+        if (current_pos == 0) {
             throw std::out_of_range("Cannot move left from position 0");
         }
-        currentPos--;
+        current_pos--;
     }
 
-    void moveRight() {
-        applyDelay(shiftDelay);
-        currentPos++;
+    void move_right() {
+        apply_delay(shift_delay);
+        current_pos++;
     }
 
     void rewind() {
-        applyDelay(rewindDelay);
-        currentPos = 0;
+        apply_delay(rewind_delay);
+        current_pos = 0;
     }
 
-    bool isEOT() {
+    bool is_EOT() {
         std::streampos originalPos = file.tellg();
         file.seekg(0, std::ios::end);
         size_t fileSize = file.tellg();
         file.seekg(originalPos);
-        return currentPos * sizeof(int) >= fileSize;
+        return current_pos * sizeof(int) >= fileSize;
     }
 };
 
