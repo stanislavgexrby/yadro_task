@@ -1,4 +1,4 @@
-#include "tape.hpp"
+#include "sorting.hpp"
 
 int Tape::read_delay = 0;
 int Tape::write_delay = 0;
@@ -48,17 +48,15 @@ int main(int argc, char* argv[]) {
             config["shift_delay"]
         );
 
-        Tape input_tape(input_path, false);
-        Tape output_tape(output_path, true);
+        Tape input_tape(input_path, 6, false);
+        Tape output_tape(output_path, 6, true);
 
         input_tape.rewind();
         output_tape.rewind();
 
-        while (!input_tape.is_EOT()) {
-            int value = input_tape.read();
-            std::cout << value << std::endl;
-            output_tape.write(value);
-        }
+        Sort(input_tape, output_tape);
+        std::cout << "printing output tape: ";
+        print_tape(output_tape);
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;

@@ -15,7 +15,7 @@ class Tape {
     std::fstream file;
     std::string file_path;
     size_t current_pos;
-    const size_t length;
+    size_t length = 100;
 
     static int read_delay;
     static int write_delay;
@@ -69,7 +69,6 @@ public:
         if (!file) {
             throw std::runtime_error("Read error or end of tape");
         }
-        current_pos++;
         return value;
     }
 
@@ -78,7 +77,6 @@ public:
         file.seekp(current_pos * sizeof(int));
         file.write(reinterpret_cast<const char*>(&value), sizeof(int));
         file.flush();
-        current_pos++;
     }
 
     void move_left() {
