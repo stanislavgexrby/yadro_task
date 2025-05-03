@@ -1,5 +1,5 @@
 Tape sort emulator for yadro task
-Build:
+Build:\n
 mkdir build && cd build
 cmake -G Ninja ..
 Use:
