@@ -1,7 +1,7 @@
-Tape sort emulator for yadro task
-Build:\n
-mkdir build && cd build
-cmake -G Ninja ..
+Tape sort emulator for yadro task  
+Build:  
+mkdir build && cd build  
+cmake -G Ninja ..  
 Use:
 leave build directory ( cd .. )
 g++ prepare.cpp
