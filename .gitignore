@@ -1,6 +1,7 @@
 build/
 bin/
 data/
+tmp/
 *.bin
 *.exe
 *.o
@@ -16,6 +17,3 @@ CMakeSettings.json
 # Системные файлы
 .DS_Store
 Thumbs.db
-
-# Исключения (если нужно хранить пример input.bin)
-!data/input.bin
