@@ -55,7 +55,9 @@ int main(int argc, char* argv[]) {
         output_tape.rewind();
 
         Sort(input_tape, output_tape);
-        std::cout << "printing output tape: ";
+        std::cout << "input :  ";
+        print_tape(input_tape);
+        std::cout << "output : ";
         print_tape(output_tape);
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;

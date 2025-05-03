@@ -15,7 +15,7 @@ class Tape {
     std::fstream file;
     std::string file_path;
     size_t current_pos;
-    size_t length = 100;
+    const size_t length;
 
     static int read_delay;
     static int write_delay;
@@ -36,7 +36,7 @@ public:
         shift_delay = sd;
     }
 
-    Tape(const std::string& path, const size_t n, bool create_if_no = false)
+    Tape(const std::string& path, const size_t n = 100, bool create_if_no = false)
                                 : file_path(path), length(n), current_pos(0) {
         file.open(path, std::ios::in | std::ios::out | std::ios::binary);
         if (!file.is_open()) {

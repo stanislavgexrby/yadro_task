@@ -6,12 +6,14 @@
 namespace fs = std::filesystem;
 
 void print_tape(Tape &t) {
+    t.rewind();
     while (!t.is_EOT()) {
         int j = t.read();
         t.move_right();
         std::cout << j << " ";
     }
     std::cout << std::endl;
+    t.rewind();
 }
 
 class Sort {
@@ -31,9 +33,9 @@ public:
         return max_number;
     }
 
-    std::unique_ptr<Tape> create_temp_tape() {
+    std::unique_ptr<Tape> create_temp_tape(int length = 100) {
         std::string tmp_path = "../tmp/" + std::to_string(count_tmp_tapes() + 1) + ".bin";
-        return std::make_unique<Tape>(tmp_path, 100, true);
+        return std::make_unique<Tape>(tmp_path, length, true);
     }
 
     Sort(Tape &input, Tape &output){
@@ -42,10 +44,10 @@ public:
             input.move_right();
             if (input.is_EOT()) {
                 output.write(value);
+                output.move_right();
             } else {
                 auto higher_ptr = create_temp_tape();
                 auto lower_ptr = create_temp_tape();
-                std::cout << (*lower_ptr).is_EOT() << std::endl;
                 while (!input.is_EOT()) {
                     int tmp = input.read();
                     input.move_right();
@@ -57,15 +59,16 @@ public:
                         (*lower_ptr).move_right();
                     }
                 }
+                (*lower_ptr).rewind();
+                (*higher_ptr).rewind();
 
                 auto higher_sorted_ptr = create_temp_tape();
                 auto lower_sorted_ptr = create_temp_tape();
 
                 Sort((*lower_ptr), (*lower_sorted_ptr));
                 Sort((*higher_ptr), (*higher_sorted_ptr));
-                std::cout << std::endl;
-                print_tape((*lower_sorted_ptr));
-                print_tape((*higher_sorted_ptr));
+                (*lower_sorted_ptr).rewind();
+                (*higher_sorted_ptr).rewind();
 
                 while (!(*lower_sorted_ptr).is_EOT()) {
                     int j = (*lower_sorted_ptr).read();
@@ -77,14 +80,13 @@ public:
                 output.write(value);
                 output.move_right();
 
-                (*higher_sorted_ptr).rewind();
-                (*lower_sorted_ptr).rewind();
                 while (!(*higher_sorted_ptr).is_EOT()) {
                     int i = (*higher_sorted_ptr).read();
                     (*higher_sorted_ptr).move_right();
                     output.write(i);
                     output.move_right();
                 }
+                output.rewind();
             }
         }
     }
