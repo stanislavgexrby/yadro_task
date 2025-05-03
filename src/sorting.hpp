@@ -38,7 +38,7 @@ public:
         return std::make_unique<Tape>(tmp_path, length, true);
     }
 
-    Sort(Tape &input, Tape &output){
+    Sort(Tape &input, Tape &output, const size_t size_of_ram){
         if (!input.is_EOT()) {
             int value1 = input.read();
             input.move_right();
@@ -81,14 +81,14 @@ public:
 
                     if (!(*lower_ptr).is_EOT()) {
                         lower_sorted_ptr = create_temp_tape();
-                        Sort((*lower_ptr), (*lower_sorted_ptr));
+                        Sort((*lower_ptr), (*lower_sorted_ptr), size_of_ram);
                         (*lower_sorted_ptr).rewind();
                     } else {
                         lower_sorted_ptr = std::move(lower_ptr);
                     }
                     if (!(*higher_ptr).is_EOT()) {
                         higher_sorted_ptr = create_temp_tape();
-                        Sort((*higher_ptr), (*higher_sorted_ptr));
+                        Sort((*higher_ptr), (*higher_sorted_ptr), size_of_ram);
                         (*higher_sorted_ptr).rewind();
                     } else {
                         higher_sorted_ptr = std::move(higher_ptr);

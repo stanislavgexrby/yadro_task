@@ -47,14 +47,21 @@ int main(int argc, char* argv[]) {
             config["rewind_delay"],
             config["shift_delay"]
         );
+        size_t length_of_tape;
+        size_t size_of_ram;
+        std::cout << "Enter legnth of tape:" << std::endl;
+        std::cin >> length_of_tape;
+        std::cout << "Enter size of RAM:" << std::endl;
+        std::cin >> size_of_ram;
 
-        Tape input_tape(input_path, 100, false);
-        Tape output_tape(output_path, 100, true);
+
+        Tape input_tape(input_path, length_of_tape, false);
+        Tape output_tape(output_path, length_of_tape, true);
 
         input_tape.rewind();
         output_tape.rewind();
 
-        Sort(input_tape, output_tape);
+        Sort(input_tape, output_tape, size_of_ram);
         std::cout << "input  : ";
         print_tape(input_tape);
         std::cout << "output : ";
