@@ -23,9 +23,8 @@ class Tape {
     static int shift_delay;
 
     void apply_delay(int delay) const {
-        if (delay > 0) {
-            //std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-        }
+        //std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+        //std::cout << "delay: " << delay << std::endl;
     }
 
 public:
@@ -98,10 +97,11 @@ public:
     }
 
     bool is_EOT() {
-        std::streampos originalPos = file.tellg();
+        std::streampos original_pos = file.tellg();
         file.seekg(0, std::ios::end);
+
         size_t fileSize = file.tellg();
-        file.seekg(originalPos);
+        file.seekg(original_pos);
         return current_pos * sizeof(int) >= fileSize;
     }
 };

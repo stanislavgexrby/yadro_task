@@ -48,14 +48,14 @@ int main(int argc, char* argv[]) {
             config["shift_delay"]
         );
 
-        Tape input_tape(input_path, 6, false);
-        Tape output_tape(output_path, 6, true);
+        Tape input_tape(input_path, 100, false);
+        Tape output_tape(output_path, 100, true);
 
         input_tape.rewind();
         output_tape.rewind();
 
         Sort(input_tape, output_tape);
-        std::cout << "input :  ";
+        std::cout << "input  : ";
         print_tape(input_tape);
         std::cout << "output : ";
         print_tape(output_tape);
