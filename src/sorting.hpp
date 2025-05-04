@@ -87,82 +87,6 @@ public:
 class Sort {
 public:
     Sort(Tape &input, Tape &output){
-        /*if (!input.is_EOT()) {
-            int value1 = input.read();
-            input.move_right();
-            if (input.is_EOT()) {
-                output.write(value1);
-                output.move_right();
-            } else {
-                int value2 = input.read();
-                input.move_right();
-                if (input.is_EOT()) {
-                    if (value1 < value2) {
-                        output.write(value1);
-                        output.move_right();
-                        output.write(value2);
-                    } else {
-                        output.write(value2);
-                        output.move_right();
-                        output.write(value1);
-                    }
-                    output.rewind();
-                } else {
-                    auto higher_ptr = create_temp_tape();
-                    auto lower_ptr = create_temp_tape();
-                    while (!input.is_EOT()) {
-                        int tmp = input.read();
-                        input.move_right();
-                        if (tmp > value1) {
-                            (*higher_ptr).write(tmp);
-                            (*higher_ptr).move_right();
-                        } else {
-                            (*lower_ptr).write(tmp);
-                            (*lower_ptr).move_right();
-                        }
-                    }
-                    (*lower_ptr).rewind();
-                    (*higher_ptr).rewind();
-
-                    std::unique_ptr<Tape> lower_sorted_ptr;
-                    std::unique_ptr<Tape> higher_sorted_ptr;
-
-                    if (!(*lower_ptr).is_EOT()) {
-                        lower_sorted_ptr = create_temp_tape();
-                        Sort((*lower_ptr), (*lower_sorted_ptr), size_of_ram);
-                        (*lower_sorted_ptr).rewind();
-                    } else {
-                        lower_sorted_ptr = std::move(lower_ptr);
-                    }
-                    if (!(*higher_ptr).is_EOT()) {
-                        higher_sorted_ptr = create_temp_tape();
-                        Sort((*higher_ptr), (*higher_sorted_ptr), size_of_ram);
-                        (*higher_sorted_ptr).rewind();
-                    } else {
-                        higher_sorted_ptr = std::move(higher_ptr);
-                    }
-
-                    while (!(*lower_sorted_ptr).is_EOT()) {
-                        int j = (*lower_sorted_ptr).read();
-                        (*lower_sorted_ptr).move_right();
-                        output.write(j);
-                        output.move_right();
-                    }
-
-                    output.write(value1);
-                    output.move_right();
-
-                    while (!(*higher_sorted_ptr).is_EOT()) {
-                        int i = (*higher_sorted_ptr).read();
-                        (*higher_sorted_ptr).move_right();
-                        output.write(i);
-                        output.move_right();
-                    }
-
-                    output.rewind();
-                }
-            }
-        }*/
         size_t length = input.get_length();
         size_t number_of_blocks = divide_for_blocks(length, size_of_ram);
         std::vector<std::unique_ptr<Tape>> tape_container;
@@ -174,43 +98,68 @@ public:
             tape_container.push_back(std::move(b.get_tape()));
             b.~Block();
         }
+        std::cout << std::endl;
         size_t g = 0;
         //maybe vise versa for rewind()
         for (size_t i = 0; i < length; ++i) {
+            std::cout << "started number: " << i << std::endl;
+            size_t buf = 0;
             std::pair<int, size_t> current;
+            current.second = 0;
             std::vector<int> pretend_start;
             size_t k;
+            std::cout << "pretend_start: ";
             for (k = 0; k < size_of_ram && k < number_of_blocks; ++k) {
+                if ((*tape_container[k]).is_EOT()) {
+                    buf++;
+                    continue;
+                }
                 pretend_start.push_back((*tape_container[k]).read());
+                std::cout << (*tape_container[k]).read() << " ";
             }
+            std::cout << std::endl;
             auto min_it_start = std::min_element(pretend_start.begin(), pretend_start.end());
             current.first = *min_it_start;
             current.second = std::distance(pretend_start.begin(), min_it_start);
+            std::cout << "pretend start number: " << current.second;
+            std::cout << std::endl;
+            pretend_start.clear();
 
-            bool over = (k == number_of_blocks) ? true : false;
             std::vector<int> pretend;
-            while (true) {
+            size_t number_of_loops = 1;
+            while (k != number_of_blocks) {
                 size_t g = 0;
+                std::cout << "additional: ";
                 for (; g < size_of_ram && g + k < number_of_blocks;) {
-                    pretend.push_back((*tape_container[g]).read());
+                    if ((*tape_container[k + g]).is_EOT()) {
+                        buf++;
+                        continue;
+                    }
+                    pretend.push_back((*tape_container[k + g]).read());
+                    std::cout << (*tape_container[k + g]).read() << " ";
                     g++;
                 }
+                std::cout << std::endl;
                 k += g;
                 auto min_it = std::min_element(pretend.begin(), pretend.end());
-                if (*min_it <= current.first) {
+                if (*min_it < current.first) {
                     current.first = *min_it;
-                    current.second = std::distance(pretend.begin(), min_it);
+                    current.second = number_of_loops * size_of_ram + std::distance(pretend.begin(), min_it);
+                    std::cout << "pretend additional number: " << std::distance(pretend.begin(), min_it);
+                    std::cout << std::endl;
                 }
+                number_of_loops++;
                 pretend.clear();
-                if (k == number_of_blocks) {
-                    break;
-                }
             }
+            std::cout << "buf: " << buf << std::endl;
             std::cout << "min element: " << current.first << std::endl;
-            (*tape_container[current.second]).move_right();
-
+            std::cout << "moving tape number: " << current.second + buf<< std::endl;
+            (*tape_container[current.second + buf]).move_right();
+            std::cout << "writing followed " << std::endl;
             output.write(current.first);
             output.move_right();
+            std::cout << "writing ended " << std::endl;
+            std::cout << std::endl;
         }
     }
 

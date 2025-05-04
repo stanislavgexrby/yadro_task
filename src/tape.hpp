@@ -66,6 +66,7 @@ public:
         int value;
         file.read(reinterpret_cast<char*>(&value), sizeof(int));
         if (!file) {
+            //std::cout << "pos: " << current_pos << " length: " << length << std::endl;
             throw std::runtime_error("Read error or end of tape");
         }
         return value;
@@ -87,9 +88,6 @@ public:
     }
 
     void move_right() {
-        if (current_pos > length) {
-            throw std::out_of_range("Cannot move right beyond the length");
-        }
         apply_delay(shift_delay);
         current_pos++;
     }
@@ -110,6 +108,11 @@ public:
         size_t fileSize = file.tellg();
         file.seekg(original_pos);
         return current_pos * sizeof(int) >= fileSize;
+        //return current_pos == length;
+    }
+
+    size_t get_pos() {
+        return current_pos;
     }
 };
 
