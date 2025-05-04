@@ -2,18 +2,26 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <random>
+#include <chrono>
+#include <limits>
 
 int main() {
     //std::vector<int> data = {143, 78, 0, -10000,3,34,57,5,3,5,8,9,9,9,9,9,9};
-    std::string input_line;
     std::vector<int> data;
-    getline(std::cin, input_line);
+    int n;
+    std::cin >> n;
 
-    std::stringstream ss(input_line);
-    int num;
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::mt19937 gen(seed);
 
-    while (ss >> num) {
-        data.push_back(num);
+    std::uniform_int_distribution<int> distrib(
+        std::numeric_limits<int>::min(),
+        std::numeric_limits<int>::max()
+    );
+
+    for (int i = 0; i < n; ++i) {
+        data.push_back(distrib(gen));
     }
 
     std::ofstream out("data/input.bin", std::ios::binary);

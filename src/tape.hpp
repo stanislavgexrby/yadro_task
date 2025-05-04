@@ -87,6 +87,9 @@ public:
     }
 
     void move_right() {
+        if (current_pos > length) {
+            throw std::out_of_range("Cannot move right beyond the length");
+        }
         apply_delay(shift_delay);
         current_pos++;
     }
@@ -94,6 +97,10 @@ public:
     void rewind() {
         apply_delay(rewind_delay);
         current_pos = 0;
+    }
+
+    const size_t get_length() {
+        return length;
     }
 
     bool is_EOT() {
