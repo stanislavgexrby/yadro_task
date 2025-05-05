@@ -60,16 +60,18 @@ public:
         }
     }
 
-    int read() {
+    int read(int &value) {
+        if (is_EOT()) {
+            return 1;
+        }
         apply_delay(read_delay);
         file.seekg(current_pos * sizeof(int));
-        int value;
         file.read(reinterpret_cast<char*>(&value), sizeof(int));
         if (!file) {
-            //std::cout << "pos: " << current_pos << " length: " << length << std::endl;
-            throw std::runtime_error("Read error or end of tape");
+            std::cout << "pos: " << current_pos << " length: " << length << "path: " << file_path << std::endl;
+            throw std::runtime_error("Read error");
         }
-        return value;
+        return 0;
     }
 
     void write(int value) {
@@ -81,9 +83,6 @@ public:
 
     void move_left() {
         apply_delay(shift_delay);
-        if (current_pos == 0) {
-            throw std::out_of_range("Cannot move left from position 0");
-        }
         current_pos--;
     }
 
@@ -102,12 +101,16 @@ public:
     }
 
     bool is_EOT() {
-        std::streampos original_pos = file.tellg();
+        /*std::streampos original_pos = file.tellg();
         file.seekg(0, std::ios::end);
 
         size_t fileSize = file.tellg();
         file.seekg(original_pos);
-        return current_pos * sizeof(int) >= fileSize;
+        return current_pos * sizeof(int) >= fileSize;*/
+        if (current_pos >= length || current_pos < 0) {
+            return true;
+        }
+        return false;
         //return current_pos == length;
     }
 

@@ -1,6 +1,7 @@
 #include "tape.hpp"
 
 #include <algorithm>
+#include <ranges>
 #include <filesystem>
 
 namespace fs = std::filesystem;
@@ -14,7 +15,8 @@ size_t divide_for_blocks(size_t a, size_t b) {
 void print_tape(Tape &t) {
     t.rewind();
     for (size_t i = 0; i < t.get_length(); ++i) {
-        int j = t.read();
+        int j ;
+        t.read(j);
         t.move_right();
         std::cout << j << " ";
     }
@@ -50,16 +52,18 @@ public:
         block = std::move(create_temp_tape(length));
         std::vector<int> items;
         for (size_t i = 0; i < length; ++i) {
-            int t = input.read();
+            int t;
+            input.read(t);
             input.move_right();
             items.push_back(t);
         }
         sort(items.begin(), items.end());
-        for (size_t j = 0; j < length; ++j) {
+        for (size_t j = 0; j < length - 1; ++j) {
             (*block).write(items[j]);
             (*block).move_right();
         }
-        (*block).rewind();
+        (*block).write(items[length - 1]);
+        //(*block).rewind();
     }
 
     const size_t get_length() {
@@ -67,14 +71,18 @@ public:
     }
 
     void print_block() {
-        (*block).rewind();
+        //(*block).rewind();
 
         for (size_t i = 0; i < (*block).get_length(); ++i) {
-            std::cout << (*block).read() << " ";
-            (*block).move_right();
+            int t;
+            (*block).read(t);
+            std::cout << t << " ";
+            (*block).move_left();
         }
         std::cout << std::endl;
         (*block).rewind();
+        for (size_t i = 0; i < (*block).get_length(); ++i)
+            (*block).move_right();
     }
 
     std::unique_ptr<Tape> get_tape() {
@@ -93,73 +101,52 @@ public:
 
         for (size_t j = 0; j < number_of_blocks; ++j) {
             Block b(input);
-            std::cout << j << " block:" << std::endl;
-            b.print_block();
+            //std::cout << j << " block:" << std::endl;
+            //b.print_block();
             tape_container.push_back(std::move(b.get_tape()));
             b.~Block();
         }
-        std::cout << std::endl;
-        size_t g = 0;
-        //maybe vise versa for rewind()
-        for (size_t i = 0; i < length; ++i) {
-            std::cout << "started number: " << i << std::endl;
-            size_t buf = 0;
-            std::pair<int, size_t> current;
-            current.second = 0;
-            std::vector<int> pretend_start;
-            size_t k;
-            std::cout << "pretend_start: ";
-            for (k = 0; k < size_of_ram && k < number_of_blocks; ++k) {
-                if ((*tape_container[k]).is_EOT()) {
-                    buf++;
-                    continue;
-                }
-                pretend_start.push_back((*tape_container[k]).read());
-                std::cout << (*tape_container[k]).read() << " ";
-            }
-            std::cout << std::endl;
-            auto min_it_start = std::min_element(pretend_start.begin(), pretend_start.end());
-            current.first = *min_it_start;
-            current.second = std::distance(pretend_start.begin(), min_it_start);
-            std::cout << "pretend start number: " << current.second;
-            std::cout << std::endl;
-            pretend_start.clear();
-
-            std::vector<int> pretend;
-            size_t number_of_loops = 1;
-            while (k != number_of_blocks) {
-                size_t g = 0;
-                std::cout << "additional: ";
-                for (; g < size_of_ram && g + k < number_of_blocks;) {
-                    if ((*tape_container[k + g]).is_EOT()) {
-                        buf++;
-                        continue;
-                    }
-                    pretend.push_back((*tape_container[k + g]).read());
-                    std::cout << (*tape_container[k + g]).read() << " ";
-                    g++;
-                }
-                std::cout << std::endl;
-                k += g;
-                auto min_it = std::min_element(pretend.begin(), pretend.end());
-                if (*min_it < current.first) {
-                    current.first = *min_it;
-                    current.second = number_of_loops * size_of_ram + std::distance(pretend.begin(), min_it);
-                    std::cout << "pretend additional number: " << std::distance(pretend.begin(), min_it);
-                    std::cout << std::endl;
-                }
-                number_of_loops++;
-                pretend.clear();
-            }
-            std::cout << "buf: " << buf << std::endl;
-            std::cout << "min element: " << current.first << std::endl;
-            std::cout << "moving tape number: " << current.second + buf<< std::endl;
-            (*tape_container[current.second + buf]).move_right();
-            std::cout << "writing followed " << std::endl;
-            output.write(current.first);
+        for (size_t g = 0; g < length - 1; ++g) {
             output.move_right();
-            std::cout << "writing ended " << std::endl;
-            std::cout << std::endl;
+        }
+
+        size_t i = length - 1;
+        for (; i < length && i >= 0; i--) {
+            std::pair<int, size_t> current;
+            size_t k;
+            bool found = false;
+
+            for (k = 0; k < size_of_ram; k++) {
+                int num;
+                if ((*tape_container[k]).read(num) == 0) {
+                    if (!found || num > current.first) {
+                        current.first = num;
+                        current.second = k;
+                        found = true;
+                    }
+                }
+            }
+            //std::cout << "after first loop max: " << current.first << " " << current.second << std::endl;
+
+            size_t g;
+            while (k != number_of_blocks) {
+                for (g = 0; g < size_of_ram - 1 && g + k < number_of_blocks; ++g) {
+                    int num;
+                    if ((*tape_container[k + g]).read(num) == 0) {
+                        if (!found || num > current.first) {
+                            //std::cout << "new max: " << current.first << " " << current.second << " at k = " << k << " g = " << g<< std::endl;
+                            current.first = num;
+                            current.second = k + g;
+                        }
+                    }
+                }
+                k += g;
+            }
+            //std::cout << "max: " << current.first << " " << current.second << std::endl;
+            (*tape_container[current.second]).move_left();
+            output.write(current.first);
+            output.move_left();
+            //std::cout << std::endl;
         }
     }
 

@@ -16,8 +16,9 @@ int main() {
     std::mt19937 gen(seed);
 
     std::uniform_int_distribution<int> distrib(
-        std::numeric_limits<int>::min(),
-        std::numeric_limits<int>::max()
+        //std::numeric_limits<int>::min(),
+        //std::numeric_limits<int>::max()
+        -100, 100
     );
 
     for (int i = 0; i < n; ++i) {

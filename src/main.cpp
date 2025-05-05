@@ -57,14 +57,15 @@ int main(int argc, char* argv[]) {
 
 
         Tape input_tape(input_path, length_of_tape, false);
+        std::cout << "input  : ";
+        print_tape(input_tape);
         Tape output_tape(output_path, length_of_tape, true);
 
         input_tape.rewind();
         output_tape.rewind();
 
         Sort(input_tape, output_tape);
-        std::cout << "input  : ";
-        print_tape(input_tape);
+
         std::cout << std::endl;
         std::cout << "output : ";
         print_tape(output_tape);
