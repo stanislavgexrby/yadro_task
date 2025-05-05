@@ -8,6 +8,8 @@ data/
 *.so
 *.dll
 
+data/input.bin
+
 # Файлы IDE
 .vscode/
 .idea/
