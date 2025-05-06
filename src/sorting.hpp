@@ -54,6 +54,7 @@ public:
         for (size_t i = 0; i < length; ++i) {
             int t;
             input.read(t);
+            std::cout << t << " "; //in order to print input
             input.move_right();
             items.push_back(t);
         }
@@ -98,7 +99,7 @@ public:
             size_t k;
             bool found = false;
 
-            for (k = 0; k < size_of_ram; k++) {
+            for (k = 0; k < std::min(size_of_ram, number_of_blocks); k++) {
                 int num;
                 if ((*tape_container[k]).read(num) == 0) {
                     if (!found || num > current.first) {

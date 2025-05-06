@@ -3,6 +3,7 @@
 #include <ostream>
 
 static bool test1() {
+    //some asserts for sorted
     return 0;
 }
 

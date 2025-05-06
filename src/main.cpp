@@ -67,8 +67,9 @@ int main(int argc, char* argv[]) {
         Sort(input_tape, output_tape);
 
         std::cout << std::endl;
+        std::cout << std::endl;
         std::cout << "output : ";
-        //print_tape(output_tape);
+        print_tape(output_tape);
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
