@@ -15,14 +15,14 @@ ninja
 ```
 
 ## Run
-Firstly add data by running 
+Firstly add data by running  
 ```bash
 cd ..
 g++ prepare.cpp
 ./a.out
 ```
-and entering the length of input tape (this tape will be fulfilled with random ints).
-Then create tape.conf file with delay preferences in data directory (example of it is already in data folder).
+and entering the length of input tape (this tape will be fulfilled with random ints).  
+Then create tape.conf file with delay preferences in data directory (example of it is already in data folder).  
 Then
 ```bash
 cd build
