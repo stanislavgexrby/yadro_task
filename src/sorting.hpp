@@ -63,26 +63,10 @@ public:
             (*block).move_right();
         }
         (*block).write(items[length - 1]);
-        //(*block).rewind();
     }
 
     const size_t get_length() {
         return (*block).get_length();
-    }
-
-    void print_block() {
-        //(*block).rewind();
-
-        for (size_t i = 0; i < (*block).get_length(); ++i) {
-            int t;
-            (*block).read(t);
-            std::cout << t << " ";
-            (*block).move_left();
-        }
-        std::cout << std::endl;
-        (*block).rewind();
-        for (size_t i = 0; i < (*block).get_length(); ++i)
-            (*block).move_right();
     }
 
     std::unique_ptr<Tape> get_tape() {
@@ -101,8 +85,6 @@ public:
 
         for (size_t j = 0; j < number_of_blocks; ++j) {
             Block b(input);
-            //std::cout << j << " block:" << std::endl;
-            //b.print_block();
             tape_container.push_back(std::move(b.get_tape()));
             b.~Block();
         }
@@ -126,7 +108,6 @@ public:
                     }
                 }
             }
-            //std::cout << "after first loop max: " << current.first << " " << current.second << std::endl;
 
             size_t g;
             while (k != number_of_blocks) {
@@ -134,7 +115,6 @@ public:
                     int num;
                     if ((*tape_container[k + g]).read(num) == 0) {
                         if (!found || num > current.first) {
-                            //std::cout << "new max: " << current.first << " " << current.second << " at k = " << k << " g = " << g<< std::endl;
                             current.first = num;
                             current.second = k + g;
                         }
@@ -142,11 +122,9 @@ public:
                 }
                 k += g;
             }
-            //std::cout << "max: " << current.first << " " << current.second << std::endl;
             (*tape_container[current.second]).move_left();
             output.write(current.first);
             output.move_left();
-            //std::cout << std::endl;
         }
     }
 
